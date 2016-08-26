@@ -13,6 +13,14 @@
 # install rustup. It just does platform detection, curls the installer
 # and runs it.
 
+# /bin/sh on Solaris is not a POSIX compatible shell, but /usr/bin/bash is.
+if [ `uname -s` = 'SunOS' -a "${POSIX_SHELL}" != "true" ]; then
+    POSIX_SHELL="true"
+    export POSIX_SHELL
+    exec /usr/bin/env bash $0 "$@"
+fi
+unset POSIX_SHELL # clear it so if we invoke other scripts, they run as bash as well
+
 set -u
 
 RUSTUP_UPDATE_ROOT="https://static.rust-lang.org/rustup/dist"
@@ -101,6 +109,13 @@ get_architecture() {
         fi
     fi
 
+    if [ "$_ostype" = SunOS -a "$_cputype" = i86pc ]; then
+        # i86pc could mean either x86 or x86-64
+        if isainfo -kv | grep -q 'amd64'; then
+            local _cputype=x86_64
+        fi
+    fi
+
     case "$_ostype" in
 
         Linux)
@@ -119,6 +134,10 @@ get_architecture() {
             local _ostype=apple-darwin
             ;;
 
+        SunOS)
+            local _ostype=sun-solaris
+            ;;
+
         MINGW* | MSYS* | CYGWIN*)
             local _ostype=pc-windows-gnu
             ;;
@@ -131,7 +150,7 @@ get_architecture() {
 
     case "$_cputype" in
 
-        i386 | i486 | i686 | i786 | x86)
+        i386 | i486 | i686 | i786 | x86 | i86pc)
             local _cputype=i686
             ;;
 
