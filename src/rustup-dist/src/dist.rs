@@ -78,7 +78,8 @@ static LIST_OSES: &'static [&'static str] = &["pc-windows",
                                               "apple-ios",
                                               "linux",
                                               "rumprun-netbsd",
-                                              "unknown-freebsd"];
+                                              "unknown-freebsd",
+                                              "sun-solaris"];
 static LIST_ENVS: &'static [&'static str] =
     &["gnu", "msvc", "gnueabi", "gnueabihf", "androideabi", "musl"];
 
